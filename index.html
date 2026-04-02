@@ -15,7 +15,6 @@
   <button class="tab" onclick="show('bed',this)">&#128716; Bed Room</button>
   <button class="tab" onclick="show('read',this)">&#128218; Reading Room</button>
   <button class="tab" onclick="show('garden',this)">&#127807; Garden</button>
-  <button class="tab" onclick="show('settings',this)">&#9881; Settings</button>
 </div>
 <div class="panel on" id="tab-front">
   <div class="card"><h2>Front Room &mdash; Relays 1&ndash;5</h2><div class="grid" id="gFront"></div></div>
@@ -49,48 +48,6 @@
     <div id="schedCont"></div>
     <div class="srow"><button class="btn btn-b" onclick="saveSchedules()">Save Schedules</button><span class="smsg" id="smsgSched">Saved!</span></div>
   </div>
-</div>
-<div class="panel" id="tab-settings">
-  <div class="card">
-    <h2>Motion 1 &mdash; Front Room (GPIO 34)</h2>
-    <div class="fld"><label>Auto-Off Timeout (s)</label><input type="number" id="M1Tim" min="1" max="300" value="10"></div>
-    <div class="fld"><label>Cooldown (s)</label><input type="number" id="M1Coo" min="1" max="300" value="20"></div>
-    <div class="ib">Controls Relays 1&ndash;10 on ESP32</div><div class="cg" id="m1Chk"></div>
-    <div class="srow"><button class="btn btn-b" onclick="saveMotion(1)">Save Motion 1</button><span class="smsg" id="smsgM1">Saved!</span></div>
-  </div>
-  <div class="card">
-    <h2>Motion 2 &mdash; Bed Room (GPIO 35)</h2>
-    <div class="fld"><label>Auto-Off Timeout (s)</label><input type="number" id="M2Tim" min="1" max="300" value="10"></div>
-    <div class="fld"><label>Cooldown (s)</label><input type="number" id="M2Coo" min="1" max="300" value="20"></div>
-    <div class="ib">Controls Relays 1&ndash;10 on ESP32</div><div class="cg" id="m2Chk"></div>
-    <div class="srow"><button class="btn btn-b" onclick="saveMotion(2)">Save Motion 2</button><span class="smsg" id="smsgM2">Saved!</span></div>
-  </div>
-  <div class="card">
-    <h2>Motion 3 &mdash; Reading Room (ESP8266)</h2>
-    <div class="fld"><label>Auto-Off Timeout (s)</label><input type="number" id="M3Tim" min="1" max="300" value="10"></div>
-    <div class="fld"><label>Cooldown (s)</label><input type="number" id="M3Coo" min="1" max="300" value="20"></div>
-    <div class="ib">Controls Reading Room Relays 1&ndash;4</div><div class="cg" id="m3Chk"></div>
-    <div class="srow"><button class="btn btn-b" onclick="saveMotion(3)">Save Motion 3</button><span class="smsg" id="smsgM3">Saved!</span></div>
-  </div>
-  <div class="card">
-    <h2>&#9728; LDR Daylight Override</h2>
-    <div class="fld"><label><input type="checkbox" id="cfgLdrCtrl"> Enable LDR Daylight Override globally</label></div>
-    <div class="fld"><label>Threshold: <b id="thrVal">50%</b></label><input type="range" id="cfgLdrThr" min="5" max="95" value="50" oninput="document.getElementById('thrVal').innerText=this.value+'%'"></div>
-    <div class="wb">Lower = more sensitive. Higher = only blocks in very bright light.</div>
-    <div class="fld"><label><input type="checkbox" id="cfgLdrM1"> Block Motion 1 during daylight</label></div>
-    <div class="fld"><label><input type="checkbox" id="cfgLdrM2"> Block Motion 2 during daylight</label></div>
-    <div class="fld"><label><input type="checkbox" id="cfgLdrM3"> Block Motion 3 during daylight</label></div>
-    <div class="srow"><button class="btn btn-b" onclick="saveLdr()">Save LDR</button><span class="smsg" id="smsgLdr">Saved!</span></div>
-  </div>
-  <div class="card">
-    <h2>Sensors Enable/Disable</h2>
-    <div class="fld"><label><input type="checkbox" id="cfgM1En" checked> Enable Motion Sensor 1</label></div>
-    <div class="fld"><label><input type="checkbox" id="cfgM2En" checked> Enable Motion Sensor 2</label></div>
-    <div class="fld"><label><input type="checkbox" id="cfgM3En" checked> Enable Motion Sensor 3</label></div>
-    <div class="fld"><label><input type="checkbox" id="cfgLdrEn" checked> Enable LDR Sensor</label></div>
-    <div class="srow"><button class="btn btn-b" onclick="saveGeneral()">Save General</button><span class="smsg" id="smsgGen">Saved!</span></div>
-  </div>
-</div>
 <script src="mqtt.min.js"></script>
 <script src="app.js"></script>
 </body></html>
