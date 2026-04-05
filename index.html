@@ -6,6 +6,28 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+<div id="lockScreen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#222;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;font-family:sans-serif;">
+  <h2 style="margin-bottom:20px;">&#128274; Security verification</h2>
+  <input type="text" id="lUser" placeholder="Username" style="margin-bottom:10px;padding:12px;border-radius:5px;border:none;width:80%;max-width:300px;font-size:16px;">
+  <input type="password" id="lPass" placeholder="Password" style="margin-bottom:20px;padding:12px;border-radius:5px;border:none;width:80%;max-width:300px;font-size:16px;">
+  <button onclick="checkLock()" style="padding:12px 24px;border-radius:5px;border:none;background:#2196f3;color:white;font-weight:bold;cursor:pointer;font-size:16px;">Login</button>
+  <div id="lErr" style="color:#ff5252;margin-top:15px;display:none;font-weight:bold;">Invalid username or password</div>
+</div>
+<script>
+  if (localStorage.getItem('sh_auth') === 'Lovely Home:Nothing2.0') {
+    document.getElementById('lockScreen').style.display = 'none';
+  }
+  function checkLock() {
+    let u = document.getElementById('lUser').value.trim();
+    let p = document.getElementById('lPass').value.trim();
+    if (u === 'Lovely Home' && p === 'Nothing2.0') {
+      localStorage.setItem('sh_auth', u + ':' + p);
+      document.getElementById('lockScreen').style.display = 'none';
+    } else {
+      document.getElementById('lErr').style.display = 'block';
+    }
+  }
+</script>
 <header>
   <h1>&#127968; Smart Home</h1>
   <div id="status" class="err">&#9679; Connecting&hellip;</div>
