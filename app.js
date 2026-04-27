@@ -103,6 +103,15 @@ function setupMessageHandler(client) {
             return;
         }
         if (topic === 'home/esp32/ldr/reading') { updateLdr(data.pct||0, data.raw||0); return; }
+
+        // LDR config — sent by ESP32 on every setting change and on boot
+        if (topic === 'home/esp32/ldr/config') {
+            if (data.ldr_en  !== undefined) cfg.ldr_en    = data.ldr_en;
+            if (data.ldr_ctrl !== undefined) cfg.ldr_ctrl  = data.ldr_ctrl;
+            if (data.ldr_thresh !== undefined) cfg.ldr_thresh = data.ldr_thresh;
+            updateLdr(lastLdrPct, lastLdrRaw);  // refresh display with new config
+            return;
+        }
     });
 }
 
