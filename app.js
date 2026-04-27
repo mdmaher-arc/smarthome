@@ -9,6 +9,7 @@ const CLOUD_USER = "HAsiB";
 const CLOUD_PASS = "HAsiB@@17";
 
 let mqttClient    = null;
+let lastLdrPct = 0, lastLdrRaw = 0;  // track last known LDR values for display refresh
 
 // ── Status bar ────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
@@ -143,10 +144,12 @@ function valveCmd(a) {
 
 // ── LDR display ───────────────────────────────────────────────
 function updateLdr(pct, raw) {
+    lastLdrPct = pct; lastLdrRaw = raw;   // always track real hardware values
     const thr = cfg.ldr_thresh||50;
-    if (dom.ldrPct) dom.ldrPct.textContent=pct+'%';
-    if (dom.ldrRaw) dom.ldrRaw.textContent=raw;
-    if (dom.ldrBar) { dom.ldrBar.style.width=pct+'%'; dom.ldrBar.style.background=pct>=thr?'#FFC107':'#2196F3'; }
+    const display = cfg.ldr_en ? pct : 0;  // show 0 when LDR is disabled
+    if (dom.ldrPct) dom.ldrPct.textContent = cfg.ldr_en ? pct+'%' : '--';
+    if (dom.ldrRaw) dom.ldrRaw.textContent = cfg.ldr_en ? raw : '--';
+    if (dom.ldrBar) { dom.ldrBar.style.width=display+'%'; dom.ldrBar.style.background=pct>=thr?'#FFC107':'#2196F3'; }
     if (dom.ldrThr) dom.ldrThr.textContent=thr+'%';
     const bdg=dom.ldrBdg; if (!bdg) return;
     if (!cfg.ldr_en) { bdg.className='bdg bdg-x'; bdg.textContent='LDR Disabled'; }
@@ -182,16 +185,24 @@ function saveSchedules() {
     schedData=saved;try{localStorage.setItem(LS_SCHED,JSON.stringify(saved));}catch(e){}flash('smsgSched');
 }
 
-function show(n,el){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));document.querySelectorAll('.tab').forEach(b=>b.classList.remove('on'));$('tab-'+n).classList.add('on');el.classList.add('on');}
+let _panels = null, _tabs = null;
+function show(n,el){
+    if (!_panels) _panels = [...document.querySelectorAll('.panel')];
+    if (!_tabs)   _tabs   = [...document.querySelectorAll('.tab')];
+    _panels.forEach(p=>p.classList.remove('on'));
+    _tabs.forEach(b=>b.classList.remove('on'));
+    $('tab-'+n).classList.add('on');
+    el.classList.add('on');
+}
 function flash(id){const e=$(id);if(!e)return;e.style.display='inline';setTimeout(()=>e.style.display='none',2000);}
 
 // ── Init ──────────────────────────────────────────────────────
-window.onload = function () {
+window.addEventListener('load', function () {
     cacheDOM();
     buildGrid('gFront','esp32',  1,FL);
     buildGrid('gBed',  'esp32',  6,BL);
     buildGrid('gRead', 'esp8266',1,['Fan','LED Light','Tube Light','Dim Light']);
     try{const c=localStorage.getItem(LS_SCHED);if(c){schedData=JSON.parse(c);}}catch(e){}
     renderSchedules();
-    startMQTT();   
-};
+    startMQTT();
+});
