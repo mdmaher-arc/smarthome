@@ -37,7 +37,9 @@ function setStatus(online) {
 }
 
 // ── State ─────────────────────────────────────────────────────
-let cfg = {};
+// Note: cfg.ldr_en defaults to true — cloud dashboard has no access to
+// ESP32 HTTP API, so we assume LDR is enabled until told otherwise via MQTT.
+let cfg = { ldr_en: true, ldr_ctrl: false, ldr_thresh: 50 };
 const m1T = Array(10).fill(false), m2T = Array(10).fill(false), m3T = Array(4).fill(false);
 let schedData = [
     { startH:6,startM:0,startPM:false,stopH:7,stopM:0,stopPM:false,enabled:false },
@@ -144,15 +146,17 @@ function valveCmd(a) {
 
 // ── LDR display ───────────────────────────────────────────────
 function updateLdr(pct, raw) {
-    lastLdrPct = pct; lastLdrRaw = raw;   // always track real hardware values
+    lastLdrPct = pct; lastLdrRaw = raw;
     const thr = cfg.ldr_thresh||50;
-    const display = cfg.ldr_en ? pct : 0;  // show 0 when LDR is disabled
-    if (dom.ldrPct) dom.ldrPct.textContent = cfg.ldr_en ? pct+'%' : '--';
-    if (dom.ldrRaw) dom.ldrRaw.textContent = cfg.ldr_en ? raw : '--';
+    // Use !== false so that undefined (not yet received) defaults to showing data
+    const ldrOn = (cfg.ldr_en !== false);
+    const display = ldrOn ? pct : 0;
+    if (dom.ldrPct) dom.ldrPct.textContent = ldrOn ? pct+'%' : '--';
+    if (dom.ldrRaw) dom.ldrRaw.textContent = ldrOn ? raw : '--';
     if (dom.ldrBar) { dom.ldrBar.style.width=display+'%'; dom.ldrBar.style.background=pct>=thr?'#FFC107':'#2196F3'; }
     if (dom.ldrThr) dom.ldrThr.textContent=thr+'%';
     const bdg=dom.ldrBdg; if (!bdg) return;
-    if (!cfg.ldr_en) { bdg.className='bdg bdg-x'; bdg.textContent='LDR Disabled'; }
+    if (!ldrOn) { bdg.className='bdg bdg-x'; bdg.textContent='LDR Disabled'; }
     else if (pct>=thr&&cfg.ldr_ctrl) { bdg.className='bdg bdg-r'; bdg.textContent='Daylight \u2014 Motion Blocked'; }
     else if (cfg.ldr_ctrl) { bdg.className='bdg bdg-g'; bdg.textContent='Dark \u2014 Motion Active'; }
     else { bdg.className='bdg bdg-x'; bdg.textContent='LDR Override Off'; }
