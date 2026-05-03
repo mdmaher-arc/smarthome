@@ -109,7 +109,30 @@ function setupMessageHandler(client) {
             if (data.ldr_en  !== undefined) cfg.ldr_en    = data.ldr_en;
             if (data.ldr_ctrl !== undefined) cfg.ldr_ctrl  = data.ldr_ctrl;
             if (data.ldr_thresh !== undefined) cfg.ldr_thresh = data.ldr_thresh;
-            updateLdr(lastLdrPct, lastLdrRaw);  // refresh display with new config
+            updateLdr(lastLdrPct, lastLdrRaw);
+            return;
+        }
+
+        // ── Schedule state — retained by HiveMQ, delivered on page open ──────
+        // Fixes: schedules now show correctly when GitHub page is opened/refreshed
+        if (topic.startsWith('home/esp8266/schedule/') && topic.endsWith('/set')) {
+            const m = topic.match(/schedule\/(\d+)\/set$/);
+            if (m) {
+                const i = +m[1];
+                if (i >= 0 && i < 3 && typeof data === 'object') {
+                    // Merge retained data into schedData — keep defaults for missing fields
+                    schedData[i] = {
+                        startH:  data.startH  !== undefined ? data.startH  : schedData[i].startH,
+                        startM:  data.startM  !== undefined ? data.startM  : schedData[i].startM,
+                        startPM: data.startPM !== undefined ? data.startPM : schedData[i].startPM,
+                        stopH:   data.stopH   !== undefined ? data.stopH   : schedData[i].stopH,
+                        stopM:   data.stopM   !== undefined ? data.stopM   : schedData[i].stopM,
+                        stopPM:  data.stopPM  !== undefined ? data.stopPM  : schedData[i].stopPM,
+                        enabled: data.enabled !== undefined ? data.enabled : schedData[i].enabled
+                    };
+                    renderSchedules(); // re-render with updated data
+                }
+            }
             return;
         }
     });
